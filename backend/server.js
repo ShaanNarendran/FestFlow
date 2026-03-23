@@ -138,8 +138,9 @@ app.post('/api/orders/cash', authMiddleware, staffOnly, async (req, res) => {
       totalAmount,
       customerPhone,
       eventCode: vendor.currentEventCode,
-      status: 'Ready', // Cash orders are usually instant
+      status: 'Preparing', // Cash orders skip verification, go straight to kitchen
       paymentMethod: 'Cash',
+      paymentConfirmed: true,
       staffId: req.user.id
     });
     await order.save();

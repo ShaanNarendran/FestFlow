@@ -11,11 +11,13 @@ export default function Storefront() {
   // Cart state
   const [cart, setCart] = useState({});
   const [phone, setPhone] = useState('');
+  const [upiTransactionId, setUpiTransactionId] = useState('');
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placedOrderId, setPlacedOrderId] = useState(null);
   const [placedOrderStatus, setPlacedOrderStatus] = useState('');
   const [placing, setPlacing] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState(1);
 
   useEffect(() => {
     fetch(`/api/vendors/store/${slug}`)
@@ -82,6 +84,10 @@ export default function Storefront() {
       setError('Please enter a valid Phone number');
       return;
     }
+    if (!upiTransactionId || upiTransactionId.trim().length < 4) {
+      setError('Please enter a valid UPI Transaction / Reference ID');
+      return;
+    }
     setPlacing(true);
     setError('');
     try {
@@ -92,6 +98,7 @@ export default function Storefront() {
           vendorSlug: slug,
           items: cartItems.map((it) => ({ name: it.name, price: it.price, quantity: it.quantity })),
           customerPhone: phone,
+          upiTransactionId: upiTransactionId.trim(),
         }),
       });
       const data = await res.json();
@@ -114,6 +121,7 @@ export default function Storefront() {
       window.dispatchEvent(new Event('orderPlaced'));
       
       setCart({});
+      setUpiTransactionId('');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -305,12 +313,32 @@ export default function Storefront() {
           backdropFilter: 'blur(8px)',
         }}>
           <div className="card" style={{ maxWidth: '440px', width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--cream-vanilla)', padding: '2.5rem 2rem', border: 'none' }}>
-            <h2 style={{ fontWeight: 900, marginBottom: '0.5rem', fontSize: '1.75rem', color: 'var(--cherry-cola)', textAlign: 'center' }}>💳 Checkout</h2>
+            {/* Progress Steps */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '50%',
+                background: 'var(--cherry-cola)', color: 'white',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: '900', fontSize: '1rem'
+              }}>1</div>
+              <div style={{ width: '40px', height: '2px', background: checkoutStep >= 2 ? 'var(--cherry-cola)' : '#ddd', alignSelf: 'center' }}></div>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '50%',
+                background: checkoutStep >= 2 ? 'var(--cherry-cola)' : '#ddd',
+                color: checkoutStep >= 2 ? 'white' : '#999',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: '900', fontSize: '1rem'
+              }}>2</div>
+            </div>
+
+            <h2 style={{ fontWeight: 900, marginBottom: '0.5rem', fontSize: '1.75rem', color: 'var(--cherry-cola)', textAlign: 'center' }}>
+              {checkoutStep === 1 ? '💳 Pay via UPI' : '✅ Confirm Order'}
+            </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '1.5rem', textAlign: 'center', fontWeight: '600' }}>
               {cartCount} items · Total ₹{cartTotalAmount}
             </p>
 
-            {error && <div className="error-msg" style={{ textAlign: 'center' }}>{error}</div>}
+            {error && <div className="error-msg" style={{ textAlign: 'center', marginBottom: '1rem' }}>{error}</div>}
 
             {/* Items Summary */}
             <div style={{ marginBottom: '1.5rem', background: 'rgba(154, 0, 2, 0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px dashed var(--cherry-cola)' }}>
@@ -326,55 +354,101 @@ export default function Storefront() {
               </div>
             </div>
 
-            {/* WhatsApp Number */}
-            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-              <label className="form-label">WhatsApp Number</label>
-              <input
-                className="form-input"
-                type="tel"
-                placeholder="91XXXXXXXXXX"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
+            {checkoutStep === 1 && (
+              <>
+                {/* UPI QR Code */}
+                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1rem', fontWeight: '600' }}>
+                    Scan to pay ₹{cartTotalAmount} via UPI:
+                  </p>
+                  <div style={{ display: 'inline-block', padding: '12px', background: 'white', borderRadius: '16px', border: '4px solid var(--cherry-cola)', boxShadow: '0 4px 20px rgba(154, 0, 2, 0.15)' }}>
+                    <QRCodeSVG value={upiString} size={180} />
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.75rem' }}>
+                    Pay to: <strong style={{ color: 'var(--cherry-dark)' }}>{vendor.upiId}</strong>
+                  </p>
+                </div>
 
-            {/* Step 1: Place Order */}
-            <button
-              className="btn btn-primary btn-lg btn-block"
-              onClick={placeOrder}
-              disabled={placing}
-              style={{ padding: '1.25rem', fontSize: '1.1rem', borderRadius: '50px' }}
-            >
-              {placing ? 'Placing Order...' : '🛒 Place Order'}
-            </button>
+                {/* Payment Instructions */}
+                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(154, 0, 2, 0.05)', borderRadius: '12px', border: '1px solid var(--cherry-cola)' }}>
+                  <p style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--cherry-cola)', margin: '0 0 0.5rem' }}>💡 How to Pay</p>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+                    1. Open any UPI app (GPay, PhonePe, Paytm)<br/>
+                    2. Scan the QR code above or pay to <strong>{vendor.upiId}</strong><br/>
+                    3. Pay ₹{cartTotalAmount} and note the Transaction ID<br/>
+                    4. Click "I've Paid" below to continue
+                  </p>
+                </div>
 
-            {/* Payment Instructions */}
-            <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(154, 0, 2, 0.05)', borderRadius: '12px', border: '1px solid var(--cherry-cola)' }}>
-              <p style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--cherry-cola)', margin: '0 0 0.5rem' }}>💡 Payment Instructions</p>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
-                1. Scan the UPI QR code below to pay<br/>
-                2. Complete payment in your UPI app<br/>
-                3. Click "Place Order" above to submit your order<br/>
-                4. The vendor will verify your payment
-              </p>
-            </div>
+                <button
+                  className="btn btn-primary btn-lg btn-block"
+                  onClick={() => { setCheckoutStep(2); setError(''); }}
+                  style={{ padding: '1.25rem', fontSize: '1.1rem', borderRadius: '50px' }}
+                >
+                  ✅ I've Paid — Continue
+                </button>
+              </>
+            )}
+
+            {checkoutStep === 2 && (
+              <>
+                {/* WhatsApp Number */}
+                <div className="form-group" style={{ marginBottom: '1rem' }}>
+                  <label className="form-label" style={{ fontWeight: '700' }}>WhatsApp Number</label>
+                  <input
+                    className="form-input"
+                    type="tel"
+                    placeholder="91XXXXXXXXXX"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+
+                {/* UPI Transaction ID */}
+                <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                  <label className="form-label" style={{ fontWeight: '700' }}>UPI Transaction / Reference ID *</label>
+                  <input
+                    className="form-input"
+                    type="text"
+                    placeholder="Enter your UPI transaction ID"
+                    value={upiTransactionId}
+                    onChange={(e) => setUpiTransactionId(e.target.value)}
+                    style={{ border: upiTransactionId.trim().length >= 4 ? '2px solid var(--success)' : '2px solid var(--border)' }}
+                  />
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                    You can find this in your UPI app's transaction history. This helps the vendor verify your payment.
+                  </p>
+                </div>
+
+                <button
+                  className="btn btn-primary btn-lg btn-block"
+                  onClick={placeOrder}
+                  disabled={placing || upiTransactionId.trim().length < 4}
+                  style={{
+                    padding: '1.25rem', fontSize: '1.1rem', borderRadius: '50px',
+                    opacity: upiTransactionId.trim().length < 4 ? 0.5 : 1
+                  }}
+                >
+                  {placing ? 'Placing Order...' : '🛒 Place Order'}
+                </button>
+
+                <button
+                  className="btn btn-outline btn-block"
+                  style={{ marginTop: '0.75rem', border: 'none' }}
+                  onClick={() => { setCheckoutStep(1); setError(''); }}
+                >
+                  ← Back to Payment
+                </button>
+              </>
+            )}
 
             <button
               className="btn btn-outline btn-block"
-              style={{ marginTop: '0.75rem', border: 'none' }}
-              onClick={() => setShowCheckout(false)}
+              style={{ marginTop: '0.5rem', border: 'none', fontSize: '0.9rem' }}
+              onClick={() => { setShowCheckout(false); setCheckoutStep(1); setError(''); }}
             >
-              ← Back to Menu
+              ✕ Cancel
             </button>
-            
-            <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                Scan to pay via UPI:
-              </p>
-              <div style={{ display: 'inline-block', padding: '10px', background: 'white', borderRadius: '12px', border: '4px solid var(--cherry-cola)' }}>
-                <QRCodeSVG value={upiString} size={150} />
-              </div>
-            </div>
           </div>
         </div>
       )}

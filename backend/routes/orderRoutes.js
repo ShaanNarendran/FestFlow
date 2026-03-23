@@ -20,7 +20,12 @@ const authMiddleware = (req, res, next) => {
 // POST /api/orders  (Customer places an order)
 router.post('/', async (req, res) => {
   try {
-    const { vendorSlug, items, customerPhone } = req.body;
+    const { vendorSlug, items, customerPhone, upiTransactionId } = req.body;
+
+    // Require payment confirmation (UPI transaction ID)
+    if (!upiTransactionId || upiTransactionId.trim().length < 4) {
+      return res.status(400).json({ error: 'Please enter a valid UPI Transaction / Reference ID to confirm payment.' });
+    }
 
     // Find vendor by slug
     const vendor = await Vendor.findOne({ slug: vendorSlug });
@@ -57,6 +62,8 @@ router.post('/', async (req, res) => {
       totalAmount,
       customerPhone,
       eventCode: vendor.currentEventCode,
+      paymentConfirmed: true,
+      upiTransactionId: upiTransactionId.trim(),
     });
     await order.save();
 
@@ -72,9 +79,10 @@ router.post('/', async (req, res) => {
 // GET /api/orders/active  (Vendor fetches their active orders for POS — short polling target)
 router.get('/active', authMiddleware, async (req, res) => {
   try {
+    const vendorId = req.user.role === 'staff' ? req.user.vendorId : req.user.id;
     const orders = await Order.find({
-      vendorId: req.user.id,
-      status: { $in: ['Awaiting Verification', 'Confirmed', 'Preparing'] },
+      vendorId,
+      status: { $in: ['Awaiting Verification', 'Confirmed', 'Preparing', 'Ready'] },
     }).sort({ createdAt: -1 });
 
     res.json(orders);
@@ -83,18 +91,68 @@ router.get('/active', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/orders/history  (Vendor fetches their completed order ledger)
+// GET /api/orders/history  (Vendor fetches their completed order ledger + analytics)
 router.get('/history', authMiddleware, async (req, res) => {
   try {
     const orders = await Order.find({
       vendorId: req.user.id,
     }).sort({ createdAt: -1 });
 
-    const totalRevenue = orders
-      .filter((o) => o.status === 'Completed' || o.status === 'Ready' || o.status === 'Confirmed')
-      .reduce((sum, o) => sum + o.totalAmount, 0);
+    const completedOrders = orders.filter(
+      (o) => o.status === 'Completed' || o.status === 'Ready' || o.status === 'Confirmed' || o.status === 'Preparing'
+    );
 
-    res.json({ totalRevenue, orders });
+    const totalRevenue = completedOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const avgOrderValue = completedOrders.length > 0 ? Math.round(totalRevenue / completedOrders.length) : 0;
+
+    // Revenue by payment method
+    const paymentBreakdown = { UPI: 0, Cash: 0 };
+    const paymentCounts = { UPI: 0, Cash: 0 };
+    completedOrders.forEach(o => {
+      const method = o.paymentMethod || 'UPI';
+      paymentBreakdown[method] = (paymentBreakdown[method] || 0) + o.totalAmount;
+      paymentCounts[method] = (paymentCounts[method] || 0) + 1;
+    });
+
+    // Order status breakdown
+    const statusBreakdown = {};
+    orders.forEach(o => {
+      statusBreakdown[o.status] = (statusBreakdown[o.status] || 0) + 1;
+    });
+
+    // Hourly distribution (all time)
+    const hourlyDistribution = {};
+    for (let h = 0; h < 24; h++) hourlyDistribution[h] = { orders: 0, revenue: 0 };
+    orders.forEach(o => {
+      const hour = new Date(o.createdAt).getHours();
+      hourlyDistribution[hour].orders += 1;
+      hourlyDistribution[hour].revenue += o.totalAmount;
+    });
+
+    // Daily revenue trend (last 14 days)
+    const dailyTrend = {};
+    const fourteenDaysAgo = new Date();
+    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+    orders.forEach(o => {
+      const date = new Date(o.createdAt);
+      if (date >= fourteenDaysAgo) {
+        const dayKey = date.toISOString().split('T')[0]; // YYYY-MM-DD
+        if (!dailyTrend[dayKey]) dailyTrend[dayKey] = { orders: 0, revenue: 0 };
+        dailyTrend[dayKey].orders += 1;
+        dailyTrend[dayKey].revenue += o.totalAmount;
+      }
+    });
+
+    res.json({
+      totalRevenue,
+      avgOrderValue,
+      paymentBreakdown,
+      paymentCounts,
+      statusBreakdown,
+      hourlyDistribution,
+      dailyTrend,
+      orders,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -139,7 +197,21 @@ router.put('/:id/status', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/orders/:id  (Customer fetches live status)
+// GET /api/orders/staff-history (Cashier views their recent orders)
+router.get('/staff-history', authMiddleware, async (req, res) => {
+  try {
+    const orders = await Order.find({
+      staffId: req.user.id,
+    }).sort({ createdAt: -1 }).limit(50);
+    
+    const totalCash = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+    res.json({ orders, totalCash });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/orders/:id  (Customer fetches live status) — MUST be last (catch-all)
 router.get('/:id', async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);

@@ -37,6 +37,14 @@ const orderSchema = new mongoose.Schema(
       enum: ['UPI', 'Cash'],
       default: 'UPI',
     },
+    paymentConfirmed: {
+      type: Boolean,
+      default: false,
+    },
+    upiTransactionId: {
+      type: String,
+      default: '',
+    },
     staffId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Staff',

@@ -80,6 +80,12 @@ export default function VendorPOS() {
                   </div>
                 ))}
               </div>
+              {order.upiTransactionId && (
+                <div style={{ marginBottom: '1rem', padding: '0.5rem 0.75rem', background: 'rgba(154, 0, 2, 0.05)', borderRadius: '8px', border: '1px dashed var(--cherry-cola)' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>UPI Txn ID</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: '900', color: 'var(--cherry-dark)', wordBreak: 'break-all' }}>{order.upiTransactionId}</div>
+                </div>
+              )}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '2px dashed var(--cherry-cola)', paddingTop: '1rem' }}>
                 <span style={{ fontWeight: 900, color: 'var(--cherry-cola)', fontSize: '1.2rem' }}>₹{order.totalAmount}</span>
                 <button className="btn btn-success" style={{ padding: '0.5rem 1rem', borderRadius: '50px' }} onClick={() => updateStatus(order._id, 'Preparing')}>
@@ -101,9 +107,18 @@ export default function VendorPOS() {
                 <span style={{ fontWeight: 900, color: 'var(--cherry-cola)' }}>
                   #{order._id.slice(-6).toUpperCase()}
                 </span>
-                <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  📱 {order.customerPhone}
-                </span>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <span style={{
+                    fontSize: '0.7rem', fontWeight: '800', padding: '0.2rem 0.5rem', borderRadius: '50px',
+                    background: order.paymentMethod === 'Cash' ? 'rgba(240, 192, 64, 0.2)' : 'rgba(154, 0, 2, 0.08)',
+                    color: order.paymentMethod === 'Cash' ? '#b8860b' : 'var(--cherry-cola)'
+                  }}>
+                    {order.paymentMethod === 'Cash' ? '💵 Cash' : '📱 UPI'}
+                  </span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+                    📱 {order.customerPhone}
+                  </span>
+                </div>
               </div>
               <div style={{ marginBottom: '1rem' }}>
                 {order.items.map((item, i) => (

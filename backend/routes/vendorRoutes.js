@@ -193,4 +193,15 @@ router.get('/store/:slug', async (req, res) => {
   }
 });
 
+// GET /api/vendors/:id  (fetch vendor by ID — used by Cashier POS)
+router.get('/:id', async (req, res) => {
+  try {
+    const vendor = await Vendor.findById(req.params.id).select('-password');
+    if (!vendor) return res.status(404).json({ error: 'Vendor not found.' });
+    res.json(vendor);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
