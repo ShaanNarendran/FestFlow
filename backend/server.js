@@ -6,24 +6,19 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Debug log for incoming requests
 app.use((req, res, next) => {
   console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
   next();
 });
 
-// MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
-// Inline auth middleware to save a file slot
-// Enhanced auth middleware to handle staff
 const authMiddleware = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'No token, authorization denied' });
@@ -53,22 +48,19 @@ const staffOnly = (req, res, next) => {
 
 app.locals.authMiddleware = authMiddleware;
 
-// Route imports
 const vendorRoutes = require('./routes/vendorRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
-// Mount routes
+
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/orders', orderRoutes);
 
-// --- INLINE ADMIN, STAFF & APPLICATION ROUTES ---
 const Application = require('./models/Application');
 const Vendor = require('./models/Vendor');
 const Order = require('./models/Order');
 const Staff = require('./models/Staff');
 const bcrypt = require('bcryptjs');
 
-// POST /api/vendors/staff (Vendor creates a cashier)
 app.post('/api/vendors/staff', authMiddleware, vendorOnly, async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -90,7 +82,7 @@ app.post('/api/vendors/staff', authMiddleware, vendorOnly, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// GET /api/vendors/staff (Vendor views their staff)
+
 app.get('/api/vendors/staff', authMiddleware, vendorOnly, async (req, res) => {
   try {
     const staff = await Staff.find({ vendorId: req.user.id }).select('-password');
@@ -98,7 +90,7 @@ app.get('/api/vendors/staff', authMiddleware, vendorOnly, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// POST /api/staff/login
+
 app.post('/api/staff/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -115,13 +107,13 @@ app.post('/api/staff/login', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// POST /api/orders/cash (Cashier logs a manual order)
+
 app.post('/api/orders/cash', authMiddleware, staffOnly, async (req, res) => {
   try {
     const { items, totalAmount, customerPhone } = req.body;
     const vendor = await Vendor.findById(req.user.vendorId);
 
-    // Stock validation & deduction (reusing logic from orderRoutes)
+    
     for (const item of items) {
       const dbItem = vendor.inventory.find(i => i.name === item.name);
       if (!dbItem || dbItem.stock < item.quantity) {
@@ -138,7 +130,7 @@ app.post('/api/orders/cash', authMiddleware, staffOnly, async (req, res) => {
       totalAmount,
       customerPhone,
       eventCode: vendor.currentEventCode,
-      status: 'Preparing', // Cash orders skip verification, go straight to kitchen
+      status: 'Preparing',
       paymentMethod: 'Cash',
       paymentConfirmed: true,
       staffId: req.user.id
@@ -148,7 +140,7 @@ app.post('/api/orders/cash', authMiddleware, staffOnly, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// POST /api/applications  (Vendor applies to an event)
+
 app.post('/api/applications', authMiddleware, async (req, res) => {
   try {
     const { eventCode } = req.body;
@@ -164,7 +156,7 @@ app.post('/api/applications', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// GET /api/applications/my  (Vendor views their own applications)
+
 app.get('/api/applications/my', authMiddleware, async (req, res) => {
   try {
     const applications = await Application.find({ vendorId: req.user.id }).sort({ createdAt: -1 });
@@ -172,11 +164,11 @@ app.get('/api/applications/my', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// POST /api/admin/signup
+
 app.post('/api/admin/signup', async (req, res) => {
   try {
     const { username, password, inviteCode } = req.body;
-    // Basic protection: check for invite code if set in env
+    
     if (process.env.ADMIN_INVITE_CODE && inviteCode !== process.env.ADMIN_INVITE_CODE) {
       return res.status(401).json({ error: 'Invalid admin invite code.' });
     }
@@ -200,7 +192,7 @@ app.post('/api/admin/signup', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// POST /api/admin/login
+
 app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -218,7 +210,7 @@ app.post('/api/admin/login', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// GET /api/admin/applications/:eventCode
+
 app.get('/api/admin/applications/:eventCode', authMiddleware, adminOnly, async (req, res) => {
   try {
     const applications = await Application.find({ eventCode: req.params.eventCode.toUpperCase() }).populate('vendorId', '-password');
@@ -226,10 +218,10 @@ app.get('/api/admin/applications/:eventCode', authMiddleware, adminOnly, async (
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// PUT /api/admin/approve/:appId
+
 app.put('/api/admin/approve/:appId', authMiddleware, adminOnly, async (req, res) => {
   try {
-    const { status } = req.body; // 'approved' or 'rejected'
+    const { status } = req.body; 
     const application = await Application.findById(req.params.appId);
     if (!application) return res.status(404).json({ error: 'Application not found.' });
     application.status = status;
@@ -239,12 +231,11 @@ app.put('/api/admin/approve/:appId', authMiddleware, adminOnly, async (req, res)
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// GET /api/admin/analytics/:eventCode - Aggregated Privacy-Focused Analytics
+
 app.get('/api/admin/analytics/:eventCode', authMiddleware, adminOnly, async (req, res) => {
   try {
     const eventCode = req.params.eventCode.toUpperCase();
-    
-    // 1. Basic Aggregation (Totals)
+
     const stats = await Order.aggregate([
       { $match: { eventCode } },
       {
@@ -260,7 +251,7 @@ app.get('/api/admin/analytics/:eventCode', authMiddleware, adminOnly, async (req
 
     const totals = stats[0] || { totalRevenue: 0, totalOrders: 0, cashRevenue: 0, upiRevenue: 0 };
 
-    // 2. Vendor Distribution
+    
     const vendorStats = await Order.aggregate([
       { $match: { eventCode } },
       {
@@ -289,7 +280,7 @@ app.get('/api/admin/analytics/:eventCode', authMiddleware, adminOnly, async (req
       { $sort: { revenue: -1 } }
     ]);
 
-    // 3. Hourly Trend (Last 24 Hours)
+    
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const hourlyStats = await Order.aggregate([
       { $match: { eventCode, createdAt: { $gte: oneDayAgo } } },
@@ -311,7 +302,7 @@ app.get('/api/admin/analytics/:eventCode', authMiddleware, adminOnly, async (req
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// GET /api/admin/me
+
 app.get('/api/admin/me', authMiddleware, adminOnly, async (req, res) => {
   try { 
     const Admin = require('./models/Admin');
@@ -322,8 +313,8 @@ app.get('/api/admin/me', authMiddleware, adminOnly, async (req, res) => {
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Health check
+
 app.get('/', (req, res) => { res.json({ message: 'Stally API is running 🚀' }); });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🟢 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

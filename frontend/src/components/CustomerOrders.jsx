@@ -4,7 +4,7 @@ export default function CustomerOrders() {
   const [orders, setOrders] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Load orders from localStorage and poll for updates
+  
   useEffect(() => {
     const fetchOrders = () => {
       const savedOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
@@ -13,12 +13,12 @@ export default function CustomerOrders() {
         return;
       }
 
-      // Fetch latest status for all saved orders
+      
       Promise.all(
         savedOrders.map(async (order) => {
           try {
             const res = await fetch(`/api/orders/${order.id}`);
-            if (!res.ok) return order; // Keep old data if fetch fails
+            if (!res.ok) return order; 
             const data = await res.json();
             return {
               ...order,
@@ -34,9 +34,7 @@ export default function CustomerOrders() {
       });
     };
 
-    fetchOrders(); // Initial fetch
-    
-    // Poll every 10 seconds only if there are active (non-completed) orders
+    fetchOrders();
     const intervalId = setInterval(() => {
       const currentOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
       if (currentOrders.some(o => o.status !== 'Completed')) {
@@ -44,9 +42,9 @@ export default function CustomerOrders() {
       }
     }, 10000);
 
-    // Listen for custom event from Storefront to trigger immediate refresh
+    
     const handleOrderPlaced = () => {
-      setIsOpen(true); // Auto-open when a new order is placed
+      setIsOpen(true); 
       fetchOrders();
     };
     window.addEventListener('orderPlaced', handleOrderPlaced);

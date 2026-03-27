@@ -1,7 +1,3 @@
-/**
- * Seed script to create a Super Admin account.
- * Run once: node scripts/seedAdmin.js
- */
 require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -13,7 +9,7 @@ async function seed() {
 
   const existing = await Admin.findOne({ username: 'superadmin' });
   if (existing) {
-    console.log('⚠️  Super Admin already exists. Skipping seed.');
+    console.log('Super Admin already exists. Skipping seed.');
     process.exit(0);
   }
 
@@ -27,10 +23,10 @@ async function seed() {
   });
 
   await admin.save();
-  console.log('✅ Super Admin seeded successfully!');
-  console.log('   Username: superadmin');
-  console.log('   Password: admin123');
-  console.log('   Managed Events: CEG26');
+  console.log('Super Admin seeded successfully!');
+  console.log('Username: superadmin');
+  console.log('Password: admin123');
+  console.log('Managed Events: CEG26');
   process.exit(0);
 }
 

@@ -36,7 +36,7 @@ export default function CashierPOS() {
       return;
     }
 
-    // Fetch vendor inventory
+    
     fetch(`/api/vendors/${user.vendor.id}`)
       .then(res => res.json())
       .then(data => {
@@ -49,7 +49,7 @@ export default function CashierPOS() {
         setLoading(false);
       });
 
-    // Fetch recent orders
+      
     fetchOrders();
   }, []);
 
@@ -108,12 +108,12 @@ export default function CashierPOS() {
       setCart({});
       setPhone('');
       
-      // Refresh inventory
+      
       const vRes = await fetch(`/api/vendors/${user.vendor.id}`);
       const vData = await vRes.json();
       setItems(vData.inventory);
 
-      // Refresh orders list
+      
       fetchOrders();
 
     } catch (err) {
@@ -138,8 +138,8 @@ export default function CashierPOS() {
     <div className="page-wide" style={{ paddingBottom: '100px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
-          <h1 className="page-title" style={{ color: 'var(--cherry-cola)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-             💵 Cashier POS
+          <h1 className="page-title" style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            Cashier POS
           </h1>
           <p className="page-subtitle">{vendor?.name} · {user.username}</p>
         </div>
@@ -154,8 +154,8 @@ export default function CashierPOS() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem' }}>
         {/* Menu Section */}
-        <div className="card" style={{ border: '2px solid var(--cherry-cola)' }}>
-          <h2 style={{ marginBottom: '1.5rem', color: 'var(--cherry-dark)', fontSize: '1.25rem' }}>Menu Items</h2>
+        <div className="card" style={{ border: 'none' }}>
+          <h2 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', fontSize: '1.25rem' }}>Menu Items</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
             {items.map((item, i) => (
               <button
@@ -183,8 +183,8 @@ export default function CashierPOS() {
         </div>
 
         {/* Cart/Checkout Section */}
-        <div className="card" style={{ background: 'var(--bg-secondary)', border: '2px solid var(--cherry-cola)', alignSelf: 'start', position: 'sticky', top: '20px' }}>
-          <h2 style={{ marginBottom: '1.5rem', color: 'var(--cherry-cola)', fontWeight: '900' }}>Manual Entry</h2>
+        <div className="card" style={{ background: 'var(--bg-secondary)', border: 'none', alignSelf: 'start', position: 'sticky', top: '20px' }}>
+          <h2 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', fontWeight: '900' }}>Manual Entry</h2>
           
           <div className="form-group">
             <label className="form-label">Phone Number (Required)</label>
@@ -205,8 +205,8 @@ export default function CashierPOS() {
                   <div style={{ fontSize: '0.8rem' }}>₹{item.price} × {item.quantity}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                   <button onClick={() => removeFromCart(item.name)} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--cream-vanilla)' }}>-</button>
-                   <button onClick={() => addToCart(item)} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--cream-vanilla)' }}>+</button>
+                   <button onClick={() => removeFromCart(item.name)} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg-primary)' }}>-</button>
+                   <button onClick={() => addToCart(item)} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg-primary)' }}>+</button>
                 </div>
               </div>
             ))}
@@ -215,9 +215,9 @@ export default function CashierPOS() {
             )}
           </div>
 
-          <div style={{ borderTop: '2px solid var(--cherry-cola)', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ borderTop: '2px solid var(--border)', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: '400', fontSize: '1rem' }}>Total Amount</span>
-            <span style={{ fontWeight: '900', fontSize: '1.5rem', color: 'var(--cherry-cola)' }}>₹{total}</span>
+            <span style={{ fontWeight: '900', fontSize: '1.5rem', color: 'var(--text-primary)' }}>₹{total}</span>
           </div>
 
           <button 
@@ -234,12 +234,12 @@ export default function CashierPOS() {
       {/* Recent Cash Orders Section */}
       <div style={{ marginTop: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--cherry-cola)', margin: 0 }}>
-            📋 Recent Cash Orders
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-primary)', margin: 0 }}>
+            Recent Cash Orders
           </h2>
           <div style={{
             padding: '0.5rem 1.25rem', borderRadius: '50px',
-            background: 'var(--cherry-cola)', color: 'white', fontWeight: '900', fontSize: '1rem'
+            background: 'var(--bg-dark)', color: 'white', fontWeight: '900', fontSize: '1rem'
           }}>
             Total: ₹{totalCash.toLocaleString()}
           </div>
@@ -258,7 +258,7 @@ export default function CashierPOS() {
                 padding: '1.25rem',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                  <span style={{ fontWeight: 900, fontSize: '0.9rem', color: 'var(--cherry-cola)' }}>
+                  <span style={{ fontWeight: 900, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
                     #{order._id.slice(-6).toUpperCase()}
                   </span>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -277,15 +277,15 @@ export default function CashierPOS() {
                 <div style={{ marginBottom: '0.75rem' }}>
                   {order.items.map((item, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '0.15rem' }}>
-                      <span style={{ fontWeight: '600', color: 'var(--cherry-dark)' }}>{item.quantity}× {item.name}</span>
-                      <span style={{ fontWeight: '700', color: 'var(--cherry-cola)' }}>₹{item.price * item.quantity}</span>
+                      <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{item.quantity}× {item.name}</span>
+                      <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>₹{item.price * item.quantity}</span>
                     </div>
                   ))}
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--border)', paddingTop: '0.5rem' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>📱 {order.customerPhone}</span>
-                  <span style={{ fontWeight: '900', color: 'var(--cherry-cola)' }}>₹{order.totalAmount}</span>
+                  <span style={{ fontWeight: '900', color: 'var(--text-primary)' }}>₹{order.totalAmount}</span>
                 </div>
               </div>
             ))}

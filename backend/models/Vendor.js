@@ -53,7 +53,7 @@ vendorSchema.pre('save', async function () {
     let slug = baseSlug;
     let counter = 1;
 
-    // Ensure uniqueness
+    
     while (await mongoose.models.Vendor.findOne({ slug, _id: { $ne: this._id } })) {
       slug = `${baseSlug}-${counter}`;
       counter++;

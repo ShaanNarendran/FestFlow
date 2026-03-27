@@ -20,7 +20,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <Link to={role === 'admin' ? '/super-admin' : (role === 'staff' ? '/cashier' : '/vendor')} className="navbar-brand">
-        <span className="brand-icon">⚡</span> FestFlow
+        <span className="brand-icon"></span> FestFlow
       </Link>
 
       <div className="navbar-links">
@@ -51,7 +51,7 @@ export default function Navbar() {
             Admin Panel
           </Link>
         )}
-        <button className="nav-logout" onClick={handleLogout} style={{background: 'transparent', border: '1px solid currentColor', padding: '0.25rem 0.75rem', borderRadius: '4px', cursor: 'pointer', color: 'inherit'}}>
+        <button className="nav-logout" onClick={handleLogout}>
           Logout
         </button>
       </div>

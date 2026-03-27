@@ -8,7 +8,7 @@ export default function Storefront() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Cart state
+  
   const [cart, setCart] = useState({});
   const [phone, setPhone] = useState('');
   const [upiTransactionId, setUpiTransactionId] = useState('');
@@ -30,7 +30,7 @@ export default function Storefront() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  // Live Tracking Poller
+  
   useEffect(() => {
     let intervalId;
     if (placedOrderId && placedOrderStatus !== 'Completed') {
@@ -74,7 +74,7 @@ export default function Storefront() {
   const cartTotalAmount = cartItems.reduce((sum, it) => sum + it.price * it.quantity, 0);
   const cartCount = cartItems.reduce((sum, it) => sum + it.quantity, 0);
 
-  // UPI intent string
+  
   const upiString = vendor
     ? `upi://pay?pa=${encodeURIComponent(vendor.upiId)}&pn=${encodeURIComponent(vendor.name)}&am=${cartTotalAmount}&cu=INR&tn=${encodeURIComponent(`Order at ${vendor.name}`)}`
     : '';
@@ -108,7 +108,7 @@ export default function Storefront() {
       setPlacedOrderId(data.order._id);
       setPlacedOrderStatus(data.order.status);
       
-      // Save order to global tracking array
+      
       const currentOrders = JSON.parse(localStorage.getItem('customerOrders') || '[]');
       currentOrders.push({
         id: data.order._id,
@@ -117,7 +117,6 @@ export default function Storefront() {
         items: data.order.items.map(i => ({ name: i.name, quantity: i.quantity }))
       });
       localStorage.setItem('customerOrders', JSON.stringify(currentOrders));
-      // Notify the global CustomerOrders component
       window.dispatchEvent(new Event('orderPlaced'));
       
       setCart({});
@@ -134,7 +133,7 @@ export default function Storefront() {
   if (error && !vendor) {
     return (
       <div className="storefront-closed" style={{padding: '2rem', textAlign: 'center'}}>
-        <h1 style={{fontSize: '2rem', marginBottom: '1rem'}}>😕 Stall Not Found</h1>
+        <h1 style={{fontSize: '2rem', marginBottom: '1rem'}}>Stall Not Found</h1>
         <p style={{ color: '#888' }}>{error}</p>
       </div>
     );
@@ -143,7 +142,7 @@ export default function Storefront() {
   if (!vendor?.isLive) {
     return (
       <div className="storefront-closed" style={{padding: '2rem', textAlign: 'center'}}>
-        <h1 style={{fontSize: '2rem', marginBottom: '1rem'}}>🔒 Stall Closed</h1>
+        <h1 style={{fontSize: '2rem', marginBottom: '1rem'}}>Stall Closed</h1>
         <p style={{ color: '#888', maxWidth: '400px', margin: '0 auto' }}>
           <strong>{vendor?.name}</strong> is currently offline. Check back during the next event!
         </p>
@@ -161,26 +160,23 @@ export default function Storefront() {
     };
 
     const getStatusEmoji = () => {
-      if (placedOrderStatus === 'Confirmed') return '✅';
-      if (placedOrderStatus === 'Ready') return '🎉';
-      if (placedOrderStatus === 'Preparing') return '🔥';
-      if (placedOrderStatus === 'Completed') return '✅';
-      return '⏳';
+      if (placedOrderStatus === 'Confirmed') return '';
+      if (placedOrderStatus === 'Ready') return '';
+      if (placedOrderStatus === 'Preparing') return '';
+      if (placedOrderStatus === 'Completed') return '';
+      return '';
     };
 
     const getStatusMessage = () => {
-      if (placedOrderStatus === 'Confirmed') return 'Payment Verified and Order Confirmed! 🎉';
-      if (placedOrderStatus === 'Ready') return 'Your order is ready for pickup! 🎉';
-      if (placedOrderStatus === 'Preparing') return 'Your order is Under Preparation... 🔥';
-      if (placedOrderStatus === 'Completed') return 'Order completed. Enjoy your meal! 🍔';
-      return 'Waiting for the vendor to verify your payment... ⏳';
+      if (placedOrderStatus === 'Confirmed') return 'Payment Verified and Order Confirmed!';
+      if (placedOrderStatus === 'Ready') return 'Your order is ready for pickup!';
+      if (placedOrderStatus === 'Preparing') return 'Your order is Under Preparation...';
+      if (placedOrderStatus === 'Completed') return 'Order completed. Enjoy your meal!';
+      return 'Waiting for the vendor to verify your payment...';
     };
 
     return (
       <div className="storefront-closed" style={{padding: '2rem', textAlign: 'center'}}>
-        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>
-          {getStatusEmoji()}
-        </div>
         <h1 style={{fontSize: '2rem', marginBottom: '1rem', color: getStatusColor()}}>
           {placedOrderStatus === 'Confirmed' ? 'Payment Verified' : (placedOrderStatus === 'Preparing' ? 'Under Preparation' : placedOrderStatus)}
         </h1>
@@ -215,14 +211,14 @@ export default function Storefront() {
     );
   }
 
-  // Filter out items without stock if required by frontend logic, or display everything
+  
   return (
-    <div className="page" style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <div className="page" style={{ maxWidth: '1000px', margin: '0 auto' }}>
       {/* Header */}
       <div className="storefront-header" style={{ textAlign: 'center', marginBottom: '2rem', background: 'transparent', border: 'none' }}>
-        <div className="storefront-name" style={{ fontSize: '3rem', fontWeight: '900', color: 'var(--cherry-cola)' }}>{vendor.name}</div>
+        <div className="storefront-name" style={{ fontSize: '3rem', fontWeight: '900', color: 'var(--text-primary)' }}>{vendor.name}</div>
         <div style={{ marginTop: '0.5rem' }}>
-          <span className="badge badge-live" style={{ background: 'var(--cherry-cola)', color: 'white', border: 'none' }}>● LIVE</span>
+          <span className="badge badge-live" style={{ background: 'var(--success)', color: 'white', border: 'none' }}>● LIVE</span>
         </div>
       </div>
 
@@ -242,25 +238,26 @@ export default function Storefront() {
           return (
             <div className="menu-item" key={idx} style={{ 
               opacity: isOutOfStock ? 0.6 : 1,
-              border: inCart > 0 ? '2px solid var(--cherry-cola)' : '1px solid var(--border)',
-              background: 'white'
+              border: inCart > 0 ? '2px solid var(--text-primary)' : 'none',
+              background: 'white',
+              boxShadow: 'var(--shadow)'
             }}>
               <div style={{ flex: 1 }}>
-                <div className="menu-item-name" style={{ color: 'var(--cherry-dark)' }}>{item.name}</div>
+                <div className="menu-item-name" style={{ color: 'var(--text-primary)' }}>{item.name}</div>
                 {item.description && (
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{item.description}</div>
                 )}
-                <div style={{ fontSize: '0.8rem', color: isOutOfStock ? 'var(--cherry-cola)' : 'var(--text-muted)', marginTop: '0.2rem', fontWeight: 'bold' }}>
+                <div style={{ fontSize: '0.8rem', color: isOutOfStock ? 'var(--danger)' : 'var(--text-muted)', marginTop: '0.2rem', fontWeight: 'bold' }}>
                   {isOutOfStock ? 'SOLD OUT' : `${item.stock} available`}
                 </div>
                 {inCart > 0 && (
-                  <div style={{ fontSize: '0.85rem', color: 'var(--cherry-cola)', marginTop: '0.4rem', fontWeight: '800' }}>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', marginTop: '0.4rem', fontWeight: '800' }}>
                     {inCart} in cart
                   </div>
                 )}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span className="menu-item-price" style={{ color: 'var(--cherry-cola)', fontSize: '1.25rem' }}>₹{item.price}</span>
+                <span className="menu-item-price" style={{ color: 'var(--text-primary)', fontSize: '1.25rem' }}>₹{item.price}</span>
                 <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                   {inCart > 0 && (
                     <button className="btn btn-outline btn-sm" onClick={() => removeFromCart(item.name)} style={{ width: '32px', height: '32px', padding: 0, borderRadius: '50%' }}>
@@ -274,7 +271,7 @@ export default function Storefront() {
                       disabled={isMaxed}
                       style={{ 
                         width: '32px', height: '32px', padding: 0, borderRadius: '50%',
-                        backgroundColor: isMaxed ? '#ccc' : 'var(--cherry-cola)',
+                        backgroundColor: isMaxed ? '#ccc' : 'var(--accent)',
                         cursor: isMaxed ? 'not-allowed' : 'pointer'
                       }}
                     >
@@ -290,15 +287,15 @@ export default function Storefront() {
 
       {/* Cart Bar */}
       {cartCount > 0 && !showCheckout && (
-        <div className="cart-sticky" style={{ background: 'var(--cherry-cola)', color: 'white', borderTop: 'none' }}>
+        <div className="cart-sticky" style={{ background: 'var(--bg-dark)', color: 'white', borderTop: 'none' }}>
           <div className="cart-summary">
             <div>
               <span style={{ fontWeight: 800, fontSize: '1.2rem' }}>{cartCount} item{cartCount !== 1 ? 's' : ''}</span>
-              <span style={{ marginLeft: '1rem', fontSize: '1.4rem', fontWeight: '900', color: 'var(--cream-vanilla)' }}>
+              <span style={{ marginLeft: '1rem', fontSize: '1.4rem', fontWeight: '900', color: 'var(--text-light)' }}>
                 ₹{cartTotalAmount}
               </span>
             </div>
-            <button className="btn" onClick={() => setShowCheckout(true)} style={{ background: 'white', color: 'var(--cherry-cola)', padding: '0.8rem 2rem', borderRadius: '50px', fontWeight: '900', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+            <button className="btn" onClick={() => setShowCheckout(true)} style={{ background: 'white', color: 'var(--bg-dark)', padding: '0.8rem 2rem', borderRadius: '50px', fontWeight: '800', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
               Order Now →
             </button>
           </div>
@@ -312,27 +309,27 @@ export default function Storefront() {
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem',
           backdropFilter: 'blur(8px)',
         }}>
-          <div className="card" style={{ maxWidth: '440px', width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--cream-vanilla)', padding: '2.5rem 2rem', border: 'none' }}>
+          <div className="card" style={{ maxWidth: '440px', width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-primary)', padding: '2.5rem 2rem', border: 'none' }}>
             {/* Progress Steps */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
               <div style={{
                 width: '40px', height: '40px', borderRadius: '50%',
-                background: 'var(--cherry-cola)', color: 'white',
+                background: 'var(--accent)', color: 'white',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: '900', fontSize: '1rem'
               }}>1</div>
-              <div style={{ width: '40px', height: '2px', background: checkoutStep >= 2 ? 'var(--cherry-cola)' : '#ddd', alignSelf: 'center' }}></div>
+              <div style={{ width: '40px', height: '2px', background: checkoutStep >= 2 ? 'var(--accent)' : '#ddd', alignSelf: 'center' }}></div>
               <div style={{
                 width: '40px', height: '40px', borderRadius: '50%',
-                background: checkoutStep >= 2 ? 'var(--cherry-cola)' : '#ddd',
+                background: checkoutStep >= 2 ? 'var(--accent)' : '#ddd',
                 color: checkoutStep >= 2 ? 'white' : '#999',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: '900', fontSize: '1rem'
               }}>2</div>
             </div>
 
-            <h2 style={{ fontWeight: 900, marginBottom: '0.5rem', fontSize: '1.75rem', color: 'var(--cherry-cola)', textAlign: 'center' }}>
-              {checkoutStep === 1 ? '💳 Pay via UPI' : '✅ Confirm Order'}
+            <h2 style={{ fontWeight: 900, marginBottom: '0.5rem', fontSize: '1.75rem', color: 'var(--text-primary)', textAlign: 'center' }}>
+              {checkoutStep === 1 ? 'Pay via UPI' : 'Confirm Order'}
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '1.5rem', textAlign: 'center', fontWeight: '600' }}>
               {cartCount} items · Total ₹{cartTotalAmount}
@@ -341,14 +338,14 @@ export default function Storefront() {
             {error && <div className="error-msg" style={{ textAlign: 'center', marginBottom: '1rem' }}>{error}</div>}
 
             {/* Items Summary */}
-            <div style={{ marginBottom: '1.5rem', background: 'rgba(154, 0, 2, 0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px dashed var(--cherry-cola)' }}>
+            <div style={{ marginBottom: '1.5rem', background: 'var(--bg-input)', padding: '1.5rem', borderRadius: '12px', border: 'none' }}>
               {cartItems.map((it, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', fontSize: '1rem' }}>
-                  <span style={{ fontWeight: '700', color: 'var(--cherry-dark)' }}>{it.quantity}× {it.name}</span>
-                  <span style={{ color: 'var(--cherry-cola)', fontWeight: '800' }}>₹{it.price * it.quantity}</span>
+                  <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{it.quantity}× {it.name}</span>
+                  <span style={{ color: 'var(--text-primary)', fontWeight: '800' }}>₹{it.price * it.quantity}</span>
                 </div>
               ))}
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0 0', borderTop: '2px solid var(--cherry-cola)', fontWeight: '900', fontSize: '1.25rem', marginTop: '1rem', color: 'var(--cherry-cola)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0 0', borderTop: '2px solid var(--border)', fontWeight: '800', fontSize: '1.25rem', marginTop: '1rem', color: 'var(--text-primary)' }}>
                 <span>Total</span>
                 <span>₹{cartTotalAmount}</span>
               </div>
@@ -361,17 +358,17 @@ export default function Storefront() {
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1rem', fontWeight: '600' }}>
                     Scan to pay ₹{cartTotalAmount} via UPI:
                   </p>
-                  <div style={{ display: 'inline-block', padding: '12px', background: 'white', borderRadius: '16px', border: '4px solid var(--cherry-cola)', boxShadow: '0 4px 20px rgba(154, 0, 2, 0.15)' }}>
+                  <div style={{ display: 'inline-block', padding: '12px', background: 'white', borderRadius: '16px', border: 'none', boxShadow: 'var(--shadow)' }}>
                     <QRCodeSVG value={upiString} size={180} />
                   </div>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.75rem' }}>
-                    Pay to: <strong style={{ color: 'var(--cherry-dark)' }}>{vendor.upiId}</strong>
+                    Pay to: <strong style={{ color: 'var(--text-primary)' }}>{vendor.upiId}</strong>
                   </p>
                 </div>
 
                 {/* Payment Instructions */}
-                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(154, 0, 2, 0.05)', borderRadius: '12px', border: '1px solid var(--cherry-cola)' }}>
-                  <p style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--cherry-cola)', margin: '0 0 0.5rem' }}>💡 How to Pay</p>
+                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'var(--bg-input)', borderRadius: '12px', border: 'none' }}>
+                  <p style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.5rem' }}>How to Pay</p>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
                     1. Open any UPI app (GPay, PhonePe, Paytm)<br/>
                     2. Scan the QR code above or pay to <strong>{vendor.upiId}</strong><br/>
@@ -385,7 +382,7 @@ export default function Storefront() {
                   onClick={() => { setCheckoutStep(2); setError(''); }}
                   style={{ padding: '1.25rem', fontSize: '1.1rem', borderRadius: '50px' }}
                 >
-                  ✅ I've Paid — Continue
+                  I've Paid — Continue
                 </button>
               </>
             )}
@@ -429,7 +426,7 @@ export default function Storefront() {
                     opacity: upiTransactionId.trim().length < 4 ? 0.5 : 1
                   }}
                 >
-                  {placing ? 'Placing Order...' : '🛒 Place Order'}
+                  {placing ? 'Placing Order...' : 'Place Order'}
                 </button>
 
                 <button

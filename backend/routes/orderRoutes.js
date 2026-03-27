@@ -17,22 +17,22 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// POST /api/orders  (Customer places an order)
+
 router.post('/', async (req, res) => {
   try {
     const { vendorSlug, items, customerPhone, upiTransactionId } = req.body;
 
-    // Require payment confirmation (UPI transaction ID)
+    
     if (!upiTransactionId || upiTransactionId.trim().length < 4) {
       return res.status(400).json({ error: 'Please enter a valid UPI Transaction / Reference ID to confirm payment.' });
     }
 
-    // Find vendor by slug
+    
     const vendor = await Vendor.findOne({ slug: vendorSlug });
     if (!vendor) return res.status(404).json({ error: 'Stall not found.' });
     if (!vendor.isLive) return res.status(400).json({ error: 'This stall is currently offline.' });
 
-    // 1. Validate Stock
+    
     for (const orderItem of items) {
       const inventoryItem = vendor.inventory.find(i => i.name === orderItem.name);
       if (!inventoryItem) {
@@ -43,17 +43,17 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // 2. Deduct Stock
+    
     for (const orderItem of items) {
       const inventoryItem = vendor.inventory.find(i => i.name === orderItem.name);
       inventoryItem.stock -= orderItem.quantity;
     }
 
-    // Mark inventory as modified so Mongoose saves the subdocument changes
+    
     vendor.markModified('inventory');
     await vendor.save();
 
-    // Calculate totalAmount
+    
     const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const order = new Order({
@@ -76,7 +76,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/orders/active  (Vendor fetches their active orders for POS — short polling target)
+
 router.get('/active', authMiddleware, async (req, res) => {
   try {
     const vendorId = req.user.role === 'staff' ? req.user.vendorId : req.user.id;
@@ -91,7 +91,6 @@ router.get('/active', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/orders/history  (Vendor fetches their completed order ledger + analytics)
 router.get('/history', authMiddleware, async (req, res) => {
   try {
     const orders = await Order.find({
@@ -105,7 +104,7 @@ router.get('/history', authMiddleware, async (req, res) => {
     const totalRevenue = completedOrders.reduce((sum, o) => sum + o.totalAmount, 0);
     const avgOrderValue = completedOrders.length > 0 ? Math.round(totalRevenue / completedOrders.length) : 0;
 
-    // Revenue by payment method
+    
     const paymentBreakdown = { UPI: 0, Cash: 0 };
     const paymentCounts = { UPI: 0, Cash: 0 };
     completedOrders.forEach(o => {
@@ -113,14 +112,13 @@ router.get('/history', authMiddleware, async (req, res) => {
       paymentBreakdown[method] = (paymentBreakdown[method] || 0) + o.totalAmount;
       paymentCounts[method] = (paymentCounts[method] || 0) + 1;
     });
-
-    // Order status breakdown
+    
     const statusBreakdown = {};
     orders.forEach(o => {
       statusBreakdown[o.status] = (statusBreakdown[o.status] || 0) + 1;
     });
 
-    // Hourly distribution (all time)
+    
     const hourlyDistribution = {};
     for (let h = 0; h < 24; h++) hourlyDistribution[h] = { orders: 0, revenue: 0 };
     orders.forEach(o => {
@@ -129,14 +127,14 @@ router.get('/history', authMiddleware, async (req, res) => {
       hourlyDistribution[hour].revenue += o.totalAmount;
     });
 
-    // Daily revenue trend (last 14 days)
+    
     const dailyTrend = {};
     const fourteenDaysAgo = new Date();
     fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
     orders.forEach(o => {
       const date = new Date(o.createdAt);
       if (date >= fourteenDaysAgo) {
-        const dayKey = date.toISOString().split('T')[0]; // YYYY-MM-DD
+        const dayKey = date.toISOString().split('T')[0]; 
         if (!dailyTrend[dayKey]) dailyTrend[dayKey] = { orders: 0, revenue: 0 };
         dailyTrend[dayKey].orders += 1;
         dailyTrend[dayKey].revenue += o.totalAmount;
@@ -158,7 +156,7 @@ router.get('/history', authMiddleware, async (req, res) => {
   }
 });
 
-// PUT /api/orders/:id/status  (Vendor updates order status on the Kanban)
+
 router.put('/:id/status', authMiddleware, async (req, res) => {
   try {
     const { status } = req.body;
@@ -169,7 +167,7 @@ router.put('/:id/status', authMiddleware, async (req, res) => {
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Order not found.' });
 
-    // Ensure vendor owns this order
+    
     if (order.vendorId.toString() !== req.user.id) {
       return res.status(403).json({ error: 'You can only update your own orders.' });
     }
@@ -177,7 +175,7 @@ router.put('/:id/status', authMiddleware, async (req, res) => {
     order.status = status;
     await order.save();
 
-    // Trigger WhatsApp notifications
+    
     if (status === 'Confirmed') {
       sendWhatsApp(order.customerPhone, 'Payment verified! Your order is confirmed. ✅');
     }
@@ -197,7 +195,6 @@ router.put('/:id/status', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/orders/staff-history (Cashier views their recent orders)
 router.get('/staff-history', authMiddleware, async (req, res) => {
   try {
     const orders = await Order.find({
@@ -211,7 +208,7 @@ router.get('/staff-history', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/orders/:id  (Customer fetches live status) — MUST be last (catch-all)
+
 router.get('/:id', async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);

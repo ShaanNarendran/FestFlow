@@ -22,7 +22,7 @@ const applicationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// A vendor can only apply once per event code
+
 applicationSchema.index({ vendorId: 1, eventCode: 1 }, { unique: true });
 
 module.exports = mongoose.model('Application', applicationSchema);

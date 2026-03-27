@@ -198,16 +198,16 @@ export default function PendingDashboard() {
     }
   };
 
-  // Build QR code URL
+  
   const ipHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? '192.168.243.129' 
     : window.location.hostname;
   const qrUrl = user?.slug ? `http://${ipHost}:5173/store/${user.slug}` : '';
 
   return (
-    <div className="page" style={{ padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
-      <h1 className="page-title" style={{ fontSize: '3rem', fontWeight: '900', color: 'var(--cherry-cola)', textAlign: 'center', marginBottom: '0.5rem' }}>
-        {isPending ? '⏳ Stall Setup' : `🏪 ${user?.name}`}
+    <div className="page" style={{ padding: '2rem 5%', maxWidth: '1400px', margin: '0 auto' }}>
+      <h1 className="page-title" style={{ fontSize: '2.5rem', fontWeight: '800', textAlign: 'center', marginBottom: '0.5rem' }}>
+        {isPending ? 'Stall Setup' : user?.name}
       </h1>
       <p className="page-subtitle" style={{ textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '600' }}>
         {isPending
@@ -218,11 +218,11 @@ export default function PendingDashboard() {
       {error && <div className="error-msg">{error}</div>}
       {message && <div className="success-msg">{message}</div>}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '2.5rem', marginTop: '2.5rem' }}>
         {/* Left Column: Menu Builder */}
-        <div className="card" style={{ border: '2px solid var(--cherry-cola)', background: 'white' }}>
-          <h3 style={{ marginBottom: '1.5rem', fontWeight: '900', color: 'var(--cherry-cola)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            📋 Menu Builder
+        <div className="card">
+          <h3 style={{ marginBottom: '1.5rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            Menu Builder
           </h3>
           <form onSubmit={handleAddItem} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
             <input className="form-input" type="text" placeholder="Item Name (e.g. Classic Burger)" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} required />
@@ -257,17 +257,17 @@ export default function PendingDashboard() {
                       /* Display Mode */
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                          <div style={{ fontWeight: '800', color: 'var(--cherry-dark)' }}>{item.name}</div>
+                          <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{item.name}</div>
                           {item.description && (
                             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{item.description}</div>
                           )}
-                          <div style={{ fontSize: '0.85rem', color: 'var(--cherry-cola)', fontWeight: '700', marginTop: '0.25rem' }}>
-                            ₹{item.price} · <span style={{ color: item.stock === 0 ? 'red' : 'inherit' }}>{item.stock} in stock</span>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '600', marginTop: '0.25rem' }}>
+                            ₹{item.price} · <span style={{ color: item.stock === 0 ? 'var(--danger)' : 'inherit' }}>{item.stock} in stock</span>
                           </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <button onClick={() => startEdit(idx)} style={{ color: 'var(--cherry-cola)', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1.1rem' }} title="Edit">✏️</button>
-                          <button onClick={() => handleDeleteItem(idx)} style={{ color: 'var(--cherry-cola)', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1.1rem' }} title="Delete">🗑️</button>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <button onClick={() => startEdit(idx)} className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>Edit</button>
+                          <button onClick={() => handleDeleteItem(idx)} className="btn btn-outline" style={{ color: 'var(--danger)', borderColor: 'var(--danger-bg)', fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>Delete</button>
                         </div>
                       </div>
                     )}
@@ -281,14 +281,14 @@ export default function PendingDashboard() {
         </div>
 
         {/* Right Column: Actions */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
           {/* Apply Card */}
-          <div className="card" style={{ background: 'var(--cherry-cola)', color: 'white', border: 'none' }}>
-            <h3 style={{ marginBottom: '1rem', fontWeight: '900' }}>📩 Event Application</h3>
-            <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', opacity: 0.9 }}>Enter the event code provided by the organizers.</p>
+          <div className="card" style={{ background: 'var(--bg-dark)', color: 'white' }}>
+            <h3 style={{ marginBottom: '1rem', fontWeight: '800', color: 'white' }}>Event Application</h3>
+            <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-muted)' }}>Enter the event code provided by the organizers.</p>
             <form onSubmit={handleApply} style={{ display: 'flex', gap: '0.5rem' }}>
               <input className="form-input" type="text" placeholder="CEG26" value={eventCode} onChange={(e) => setEventCode(e.target.value)} required style={{ border: 'none', borderRadius: '50px' }} />
-              <button className="btn" type="submit" disabled={loading} style={{ background: 'white', color: 'var(--cherry-cola)', borderRadius: '50px', fontWeight: '900' }}>
+              <button className="btn" type="submit" disabled={loading} style={{ background: 'white', color: 'var(--bg-dark)', borderRadius: '50px', fontWeight: '800' }}>
                 {loading ? '...' : 'Apply'}
               </button>
             </form>
@@ -296,15 +296,15 @@ export default function PendingDashboard() {
 
           {/* Go Live Card */}
           {!isPending && (
-            <div className="card" style={{ border: '2px solid var(--cherry-cola)', background: 'white' }}>
-              <h3 style={{ marginBottom: '1rem', fontWeight: '900', color: 'var(--cherry-cola)' }}>🟢 Go Live</h3>
+            <div className="card">
+              <h3 style={{ marginBottom: '1rem', fontWeight: '800' }}>Go Live Status</h3>
               <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Toggle your stall availability for the current event.</p>
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                <input className="form-input" type="text" placeholder="Event Code" value={liveCode} onChange={(e) => setLiveCode(e.target.value)} style={{ flex: 1 }} disabled={user?.isLive} />
+                <input className="form-input" type="text" placeholder="Event Code" value={liveCode} onChange={(e) => setLiveCode(e.target.value)} style={{ flex: 1, borderRadius: '50px' }} disabled={user?.isLive} />
                 <button className="btn" onClick={handleGoLive} disabled={liveLoading} style={{ 
                   flex: 1, padding: '1rem', borderRadius: '50px',
-                  background: user?.isLive ? 'var(--cherry-cola)' : 'green', 
-                  color: 'white', fontWeight: '900' 
+                  background: user?.isLive ? 'var(--danger)' : 'var(--success)', 
+                  color: 'white', fontWeight: '800' 
                 }}>
                   {liveLoading ? '...' : user?.isLive ? 'Go Offline' : 'Go Live'}
                 </button>
@@ -314,9 +314,9 @@ export default function PendingDashboard() {
 
           {/* Staff Management Card */}
           {!isPending && (
-            <div className="card" style={{ border: '2px solid var(--cherry-cola)', background: 'white' }}>
-              <h3 style={{ marginBottom: '1.5rem', fontWeight: '900', color: 'var(--cherry-cola)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                👥 Staff Management
+            <div className="card">
+              <h3 style={{ marginBottom: '1.5rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                Staff Management
               </h3>
               <form onSubmit={handleAddStaff} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
                 <input className="form-input" type="text" placeholder="Cashier Username" value={staffUsername} onChange={(e) => setStaffUsername(e.target.value)} required />
@@ -337,13 +337,13 @@ export default function PendingDashboard() {
 
           {/* QR Code Card */}
           {user?.isLive && (
-            <div className="card" style={{ textAlign: 'center', background: 'rgba(154, 0, 2, 0.05)', border: '1px dashed var(--cherry-cola)' }}>
-              <h3 style={{ marginBottom: '0.5rem', fontWeight: '900', color: 'var(--cherry-cola)' }}>🖨️ Stall QR Code</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Print this for your customers to scan.</p>
-              <div style={{ padding: '1rem', background: 'white', borderRadius: '16px', display: 'inline-block', border: '4px solid var(--cherry-cola)' }}>
+            <div className="card" style={{ textAlign: 'center', background: 'var(--accent-yellow)' }}>
+              <h3 style={{ marginBottom: '0.5rem', fontWeight: '800' }}>Stall QR Code</h3>
+              <p style={{ color: 'var(--text-primary)', opacity: 0.8, fontSize: '0.85rem', marginBottom: '1.5rem' }}>Print this for your customers to scan.</p>
+              <div style={{ padding: '1rem', background: 'white', borderRadius: '24px', display: 'inline-block', boxShadow: 'var(--shadow)' }}>
                 <QRCodeSVG value={qrUrl} size={160} />
               </div>
-              <code style={{ width: '100%', display: 'block', marginTop: '1rem', padding: '0.75rem', background: 'white', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--cherry-cola)', fontWeight: 'bold' }}>
+              <code style={{ width: '100%', display: 'block', marginTop: '1rem', padding: '0.75rem', background: 'white', borderRadius: '12px', fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>
                 /{user?.slug}
               </code>
             </div>

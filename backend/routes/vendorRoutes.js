@@ -15,18 +15,17 @@ const authMiddleware = (req, res, next) => {
     res.status(401).json({ error: 'Token is not valid' });
   }
 };
-// POST /api/vendors/signup
 router.post('/signup', async (req, res) => {
   try {
     const { name, upiId, password } = req.body;
 
-    // Check if stall name already exists
+    
     const existing = await Vendor.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
     if (existing) {
       return res.status(400).json({ error: 'A stall with this name already exists.' });
     }
 
-    // Hash password
+    
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -38,7 +37,7 @@ router.post('/signup', async (req, res) => {
 
     await vendor.save();
 
-    // Generate JWT
+    
     const token = jwt.sign(
       { id: vendor._id, role: 'vendor' },
       process.env.JWT_SECRET,
@@ -63,7 +62,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// POST /api/vendors/login
 router.post('/login', async (req, res) => {
   try {
     const { name, password } = req.body;
@@ -101,13 +99,13 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// PUT /api/vendors/menu  (Draft Mode menu builder)
+
 router.put('/menu', authMiddleware, async (req, res) => {
   try {
     const vendor = await Vendor.findById(req.user.id);
     if (!vendor) return res.status(404).json({ error: 'Vendor not found.' });
 
-    vendor.inventory = req.body.inventory; // full array replacement
+    vendor.inventory = req.body.inventory; 
     await vendor.save();
 
     res.json({
@@ -119,7 +117,7 @@ router.put('/menu', authMiddleware, async (req, res) => {
   }
 });
 
-// PUT /api/vendors/live  (Go Live security gate)
+
 router.put('/live', authMiddleware, async (req, res) => {
   try {
     const { eventCode, goLive } = req.body;
@@ -131,7 +129,7 @@ router.put('/live', authMiddleware, async (req, res) => {
     }
 
     if (goLive) {
-      // Verify that an approved application exists for this vendor + event code
+      
       const Application = require('../models/Application');
       const app = await Application.findOne({
         vendorId: vendor._id,
@@ -154,7 +152,7 @@ router.put('/live', authMiddleware, async (req, res) => {
 
     await vendor.save();
     res.json({
-      message: goLive ? 'You are now LIVE! 🟢' : 'Stall is now OFFLINE.',
+      message: goLive ? 'You are now LIVE!' : 'Stall is now OFFLINE.',
       isLive: vendor.isLive,
       currentEventCode: vendor.currentEventCode,
     });
@@ -163,7 +161,6 @@ router.put('/live', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/vendors/me  (fetch current vendor profile)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const vendor = await Vendor.findById(req.user.id).select('-password');
@@ -174,7 +171,7 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/vendors/store/:slug (public storefront data)
+
 router.get('/store/:slug', async (req, res) => {
   try {
     const vendor = await Vendor.findOne({ slug: req.params.slug }).select('-password');
@@ -186,14 +183,14 @@ router.get('/store/:slug', async (req, res) => {
       upiId: vendor.upiId,
       isLive: vendor.isLive,
       currentEventCode: vendor.currentEventCode,
-      inventory: vendor.inventory, // Sending full inventory, frontend can filter out out-of-stock items
+      inventory: vendor.inventory, 
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/vendors/:id  (fetch vendor by ID — used by Cashier POS)
+
 router.get('/:id', async (req, res) => {
   try {
     const vendor = await Vendor.findById(req.params.id).select('-password');
