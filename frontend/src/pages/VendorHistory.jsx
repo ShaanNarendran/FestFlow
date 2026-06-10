@@ -82,54 +82,49 @@ export default function VendorHistory() {
 
   return (
     <div className="page-wide" style={{ padding: '2.5rem' }}>
-      <h1 className="page-title" style={{ fontSize: '3rem', fontWeight: '900', color: 'var(--text-primary)' }}>Analytics</h1>
-      <p className="page-subtitle" style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Your complete order history and revenue insights</p>
+      <h1 className="page-title" style={{ fontSize: '2.25rem', fontWeight: '700', color: 'var(--text-primary)' }}>Analytics</h1>
+      <p className="page-subtitle" style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>Your complete order history and revenue insights</p>
 
       {/* KPI Cards Row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
-        <div className="card" style={{ background: 'var(--bg-dark)', border: 'none', color: 'white', padding: '1.75rem', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', right: '-10px', top: '-10px', fontSize: '4.5rem', opacity: 0.1 }}></div>
-          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '900', opacity: 0.8 }}>Total Revenue</div>
-          <div style={{ fontSize: '2.25rem', fontWeight: 900 }}>₹{data.totalRevenue.toLocaleString()}</div>
+        <div className="card">
+          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '600', color: 'var(--text-secondary)' }}>Total Revenue</div>
+          <div style={{ fontSize: '2.25rem', fontWeight: 700 }}>₹{data.totalRevenue.toLocaleString()}</div>
         </div>
-        <div className="card" style={{ border: 'none', background: 'white', padding: '1.75rem', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', right: '-10px', top: '-10px', fontSize: '4.5rem', opacity: 0.05 }}></div>
-          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '900', color: 'var(--text-primary)' }}>Total Orders</div>
-          <div style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>{data.orders.length}</div>
+        <div className="card">
+          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '600', color: 'var(--text-secondary)' }}>Total Orders</div>
+          <div style={{ fontSize: '2.25rem', fontWeight: 700 }}>{data.orders.length}</div>
         </div>
-        <div className="card" style={{ border: 'none', background: 'white', padding: '1.75rem', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', right: '-10px', top: '-10px', fontSize: '4.5rem', opacity: 0.05 }}></div>
-          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '900', color: 'var(--text-primary)' }}>Avg Order Value</div>
-          <div style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>₹{avgOrderValue}</div>
+        <div className="card">
+          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '600', color: 'var(--text-secondary)' }}>Avg Order Value</div>
+          <div style={{ fontSize: '2.25rem', fontWeight: 700 }}>₹{avgOrderValue}</div>
         </div>
-        <div className="card" style={{ border: 'none', background: 'white', padding: '1.75rem', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', right: '-10px', top: '-10px', fontSize: '4.5rem', opacity: 0.05 }}></div>
-          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '900', color: 'var(--text-primary)' }}>Top Seller</div>
-          <div style={{ fontSize: '1.35rem', fontWeight: 900, color: 'var(--text-primary)', marginTop: '0.25rem' }}>{topItem[0]}</div>
-          <div style={{ fontSize: '0.8rem', fontWeight: '700', opacity: 0.7 }}>{topItem[1].quantity} units · ₹{topItem[1].revenue}</div>
+        <div className="card">
+          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '600', color: 'var(--text-secondary)' }}>Top Seller</div>
+          <div style={{ fontSize: '1.35rem', fontWeight: 600, marginTop: '0.25rem' }}>{topItem[0]}</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{topItem[1].quantity} units · ₹{topItem[1].revenue}</div>
         </div>
-        <div className="card" style={{ border: 'none', background: 'white', padding: '1.75rem', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', right: '-10px', top: '-10px', fontSize: '4.5rem', opacity: 0.05 }}></div>
-          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '900', color: 'var(--text-primary)' }}>Peak Hours</div>
-          <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--text-primary)', marginTop: '0.25rem' }}>{peakTimeStr}</div>
-          <div style={{ fontSize: '0.8rem', fontWeight: '700', opacity: 0.7 }}>Most active time</div>
+        <div className="card">
+          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '600', color: 'var(--text-secondary)' }}>Peak Hours</div>
+          <div style={{ fontSize: '1.15rem', fontWeight: 600, marginTop: '0.25rem' }}>{peakTimeStr}</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Most active time</div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', flexWrap: 'wrap', background: 'var(--bg-secondary)', padding: '0.5rem', borderRadius: '50px', border: '2px solid var(--border)' }}>
-        <button style={tabStyle('overview')} onClick={() => setActiveTab('overview')}>Overview</button>
-        <button style={tabStyle('hourly')} onClick={() => setActiveTab('hourly')}>Hourly</button>
-        <button style={tabStyle('daily')} onClick={() => setActiveTab('daily')}>Daily Trend</button>
-        <button style={tabStyle('orders')} onClick={() => setActiveTab('orders')}>Orders</button>
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', flexWrap: 'wrap', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
+        <button style={{ ...tabStyle('overview'), borderRadius: 'var(--radius)', background: activeTab === 'overview' ? 'var(--bg-dark)' : 'transparent' }} onClick={() => setActiveTab('overview')}>Overview</button>
+        <button style={{ ...tabStyle('hourly'), borderRadius: 'var(--radius)', background: activeTab === 'hourly' ? 'var(--bg-dark)' : 'transparent' }} onClick={() => setActiveTab('hourly')}>Hourly</button>
+        <button style={{ ...tabStyle('daily'), borderRadius: 'var(--radius)', background: activeTab === 'daily' ? 'var(--bg-dark)' : 'transparent' }} onClick={() => setActiveTab('daily')}>Daily Trend</button>
+        <button style={{ ...tabStyle('orders'), borderRadius: 'var(--radius)', background: activeTab === 'orders' ? 'var(--bg-dark)' : 'transparent' }} onClick={() => setActiveTab('orders')}>Orders</button>
       </div>
 
       {/* Overview Tab */}
       {activeTab === 'overview' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '1.5rem' }}>
           {/* Payment Method Breakdown */}
-          <div className="card" style={{ border: 'none' }}>
-            <h3 style={{ fontWeight: 900, color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="card">
+            <h3 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               Payment Methods
             </h3>
             {totalPaymentRevenue > 0 ? (
@@ -141,29 +136,29 @@ export default function VendorHistory() {
                     background: 'var(--bg-dark)',
                     transition: 'width 1s ease-out',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'white', fontSize: '0.75rem', fontWeight: '800'
+                    color: 'white', fontSize: '0.75rem', fontWeight: '600'
                   }}>
                     {Math.round((paymentBreakdown.UPI / totalPaymentRevenue) * 100)}%
                   </div>
                   <div style={{
                     width: `${(paymentBreakdown.Cash / totalPaymentRevenue) * 100}%`,
-                    background: '#f0c040',
+                    background: 'var(--bg-secondary)',
                     transition: 'width 1s ease-out',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#333', fontSize: '0.75rem', fontWeight: '800'
+                    color: 'var(--text-primary)', fontSize: '0.75rem', fontWeight: '600'
                   }}>
                     {Math.round((paymentBreakdown.Cash / totalPaymentRevenue) * 100)}%
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '2rem' }}>
-                  <div style={{ flex: 1, padding: '1rem', background: 'rgba(154, 0, 2, 0.05)', borderRadius: '12px', borderLeft: '4px solid var(--accent)' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase' }}>UPI</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-primary)' }}>₹{paymentBreakdown.UPI.toLocaleString()}</div>
+                  <div style={{ flex: 1, padding: '1rem', background: 'var(--bg-input)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>UPI</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>₹{paymentBreakdown.UPI.toLocaleString()}</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{paymentCounts.UPI} orders</div>
                   </div>
-                  <div style={{ flex: 1, padding: '1rem', background: 'rgba(240, 192, 64, 0.1)', borderRadius: '12px', borderLeft: '4px solid #f0c040' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Cash</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-primary)' }}>₹{paymentBreakdown.Cash.toLocaleString()}</div>
+                  <div style={{ flex: 1, padding: '1rem', background: 'var(--bg-input)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Cash</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>₹{paymentBreakdown.Cash.toLocaleString()}</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{paymentCounts.Cash} orders</div>
                   </div>
                 </div>
@@ -174,8 +169,8 @@ export default function VendorHistory() {
           </div>
 
           {/* Order Status Breakdown */}
-          <div className="card" style={{ border: 'none' }}>
-            <h3 style={{ fontWeight: 900, color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="card">
+            <h3 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               Order Status
             </h3>
             {Object.keys(statusBreakdown).length > 0 ? (

@@ -206,7 +206,7 @@ export default function PendingDashboard() {
 
   return (
     <div className="page" style={{ padding: '2rem 5%', maxWidth: '1400px', margin: '0 auto' }}>
-      <h1 className="page-title" style={{ fontSize: '2.5rem', fontWeight: '800', textAlign: 'center', marginBottom: '0.5rem' }}>
+      <h1 className="page-title" style={{ fontSize: '2rem', fontWeight: '700', textAlign: 'center', marginBottom: '0.5rem' }}>
         {isPending ? 'Stall Setup' : user?.name}
       </h1>
       <p className="page-subtitle" style={{ textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '600' }}>
@@ -221,7 +221,7 @@ export default function PendingDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '2.5rem', marginTop: '2.5rem' }}>
         {/* Left Column: Menu Builder */}
         <div className="card">
-          <h3 style={{ marginBottom: '1.5rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3 style={{ marginBottom: '1.5rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             Menu Builder
           </h3>
           <form onSubmit={handleAddItem} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
@@ -231,7 +231,7 @@ export default function PendingDashboard() {
               <input className="form-input" type="number" placeholder="Price (₹)" value={newItemPrice} onChange={(e) => setNewItemPrice(e.target.value)} required style={{ flex: 1 }} />
               <input className="form-input" type="number" placeholder="Initial Stock" value={newItemStock} onChange={(e) => setNewItemStock(e.target.value)} required style={{ flex: 1 }} />
             </div>
-            <button className="btn btn-primary" type="submit" style={{ padding: '1rem', borderRadius: '50px' }}>Add to Menu</button>
+            <button className="btn btn-primary" type="submit" style={{ padding: '0.8rem' }}>Add to Menu</button>
           </form>
 
           <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
@@ -283,12 +283,12 @@ export default function PendingDashboard() {
         {/* Right Column: Actions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
           {/* Apply Card */}
-          <div className="card" style={{ background: 'var(--bg-dark)', color: 'white' }}>
-            <h3 style={{ marginBottom: '1rem', fontWeight: '800', color: 'white' }}>Event Application</h3>
-            <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-muted)' }}>Enter the event code provided by the organizers.</p>
+          <div className="card">
+            <h3 style={{ marginBottom: '1rem', fontWeight: '600' }}>Event Application</h3>
+            <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Enter the event code provided by the organizers.</p>
             <form onSubmit={handleApply} style={{ display: 'flex', gap: '0.5rem' }}>
-              <input className="form-input" type="text" placeholder="CEG26" value={eventCode} onChange={(e) => setEventCode(e.target.value)} required style={{ border: 'none', borderRadius: '50px' }} />
-              <button className="btn" type="submit" disabled={loading} style={{ background: 'white', color: 'var(--bg-dark)', borderRadius: '50px', fontWeight: '800' }}>
+              <input className="form-input" type="text" placeholder="CEG26" value={eventCode} onChange={(e) => setEventCode(e.target.value)} required />
+              <button className="btn btn-primary" type="submit" disabled={loading}>
                 {loading ? '...' : 'Apply'}
               </button>
             </form>
@@ -297,15 +297,11 @@ export default function PendingDashboard() {
           {/* Go Live Card */}
           {!isPending && (
             <div className="card">
-              <h3 style={{ marginBottom: '1rem', fontWeight: '800' }}>Go Live Status</h3>
+              <h3 style={{ marginBottom: '1rem', fontWeight: '600' }}>Go Live Status</h3>
               <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Toggle your stall availability for the current event.</p>
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                <input className="form-input" type="text" placeholder="Event Code" value={liveCode} onChange={(e) => setLiveCode(e.target.value)} style={{ flex: 1, borderRadius: '50px' }} disabled={user?.isLive} />
-                <button className="btn" onClick={handleGoLive} disabled={liveLoading} style={{ 
-                  flex: 1, padding: '1rem', borderRadius: '50px',
-                  background: user?.isLive ? 'var(--danger)' : 'var(--success)', 
-                  color: 'white', fontWeight: '800' 
-                }}>
+                <input className="form-input" type="text" placeholder="Event Code" value={liveCode} onChange={(e) => setLiveCode(e.target.value)} style={{ flex: 1 }} disabled={user?.isLive} />
+                <button className={`btn ${user?.isLive ? 'btn-danger' : 'btn-success'}`} onClick={handleGoLive} disabled={liveLoading} style={{ flex: 1 }}>
                   {liveLoading ? '...' : user?.isLive ? 'Go Offline' : 'Go Live'}
                 </button>
               </div>
@@ -315,13 +311,13 @@ export default function PendingDashboard() {
           {/* Staff Management Card */}
           {!isPending && (
             <div className="card">
-              <h3 style={{ marginBottom: '1.5rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3 style={{ marginBottom: '1.5rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 Staff Management
               </h3>
               <form onSubmit={handleAddStaff} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
                 <input className="form-input" type="text" placeholder="Cashier Username" value={staffUsername} onChange={(e) => setStaffUsername(e.target.value)} required />
                 <input className="form-input" type="password" placeholder="Password" value={staffPassword} onChange={(e) => setStaffPassword(e.target.value)} required />
-                <button className="btn btn-primary" type="submit" style={{ borderRadius: '50px' }}>Add Cashier</button>
+                <button className="btn btn-primary" type="submit">Add Cashier</button>
               </form>
               <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
                 {staffList.map((s, i) => (
@@ -337,13 +333,13 @@ export default function PendingDashboard() {
 
           {/* QR Code Card */}
           {user?.isLive && (
-            <div className="card" style={{ textAlign: 'center', background: 'var(--accent-yellow)' }}>
-              <h3 style={{ marginBottom: '0.5rem', fontWeight: '800' }}>Stall QR Code</h3>
-              <p style={{ color: 'var(--text-primary)', opacity: 0.8, fontSize: '0.85rem', marginBottom: '1.5rem' }}>Print this for your customers to scan.</p>
-              <div style={{ padding: '1rem', background: 'white', borderRadius: '24px', display: 'inline-block', boxShadow: 'var(--shadow)' }}>
+            <div className="card" style={{ textAlign: 'center' }}>
+              <h3 style={{ marginBottom: '0.5rem', fontWeight: '600' }}>Stall QR Code</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Print this for your customers to scan.</p>
+              <div style={{ padding: '1rem', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'inline-block' }}>
                 <QRCodeSVG value={qrUrl} size={160} />
               </div>
-              <code style={{ width: '100%', display: 'block', marginTop: '1rem', padding: '0.75rem', background: 'white', borderRadius: '12px', fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>
+              <code style={{ width: '100%', display: 'block', marginTop: '1rem', padding: '0.75rem', background: 'var(--bg-input)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-card)', fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>
                 /{user?.slug}
               </code>
             </div>
